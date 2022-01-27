@@ -37,8 +37,31 @@ int ls_files(const char *path) {
   return 0;
 }
 
+void set_ls_flags(int argc, char *argv[]) {
+  opterr = 0;
+  int option;
+
+  // getopt returns -1 when there are no more options to process
+  while((option = getopt(argc, argv, "a")) != -1) {
+    switch(option) {
+      case 'a':
+        printf("Flag `-%c` passed. Will list hidden files.\n", option);
+        exclude_hidden = false;
+        break;
+      case '?': // getopt returns '?' when there is an option without a case
+        // By default, getopt() prints an error message on standard
+        // error, places the erroneous option character in optopt, and
+        // returns '?' as the function result.
+        printf("Flag `-%c` passed. Unknown flag.\n", optopt);
+    }
+  }
+
+  // Separates flag info from the actual `ls` printout
+  printf("\n");
+}
 
 int main(int argc, char *argv[]) {
+  set_ls_flags(argc, argv);
 
   // From the man page for `optind`:
   // The variable `optind` is the index of the next element to be
