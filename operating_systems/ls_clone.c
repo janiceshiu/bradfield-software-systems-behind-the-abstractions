@@ -1,10 +1,25 @@
 #include <dirent.h> // contains directory-related functions and the `dirent` struct
+#include <sys/stat.h> // contains `stat` struct and `S_ISDIR` macro
 #include <stdbool.h> // contains the definition for booleans
 #include <stdio.h>
 #include <unistd.h> // contains the `optind` variable
 
 // Global Variables for `ls` flags
 bool exclude_hidden = true;
+
+int is_directory(const char *path) {
+  struct stat stat_buffer;
+
+  // if the path cannot be read, return False
+  if (stat(path, &stat_buffer) != 0) {
+    return 0;
+  }
+
+  // arrow `->` to access if the variable is a pointer
+  // dot `.` to access if the variable is not a pointer
+  // (*x).foo is equivalent to x->foo
+  return S_ISDIR(stat_buffer.st_mode);
+}
 
 int ls_files(const char *path) {
   DIR *directory_ptr = opendir(path);
@@ -27,7 +42,14 @@ int ls_files(const char *path) {
       continue;
     }
 
-    printf("%s\n", entry->d_name);
+    #define TERMINAL_CYAN  "\x1B[36m"
+    #define TERMINAL_RESET "\x1B[0m"
+
+    if (is_directory(entry->d_name)) {
+      printf("%s%s\n%s", TERMINAL_CYAN, entry->d_name, TERMINAL_RESET);
+    } else {
+      printf("%s\n", entry->d_name);
+    }
   }
 
   // We get a segmentation fault if we try to close a directory that doesn't exist.
