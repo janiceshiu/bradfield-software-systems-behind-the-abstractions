@@ -1,6 +1,10 @@
 #include <dirent.h> // contains directory-related functions and the `dirent` struct
+#include <stdbool.h> // contains the definition for booleans
 #include <stdio.h>
 #include <unistd.h> // contains the `optind` variable
+
+// Global Variables for `ls` flags
+bool exclude_hidden = true;
 
 int ls_files(const char *path) {
   DIR *directory_ptr = opendir(path);
@@ -18,6 +22,11 @@ int ls_files(const char *path) {
       break;
     }
 
+    // hidden files start with `.`
+    if (exclude_hidden && entry->d_name[0] == '.') {
+      continue;
+    }
+
     printf("%s\n", entry->d_name);
   }
 
@@ -28,7 +37,9 @@ int ls_files(const char *path) {
   return 0;
 }
 
+
 int main(int argc, char *argv[]) {
+
   // From the man page for `optind`:
   // The variable `optind` is the index of the next element to be
   //  processed in argv.  The system initializes this value to 1.  The
