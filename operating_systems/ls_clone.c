@@ -99,6 +99,10 @@ void set_ls_flags(int argc, char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
+  if (argc > 3) {
+    printf("Usage: `./ls_clone -optional_flags optional_filepath`. Flags supported: aR\n");
+    return 1;
+  }
   set_ls_flags(argc, argv);
 
   // From the man page for `optind`:
