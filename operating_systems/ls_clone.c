@@ -106,5 +106,10 @@ int main(int argc, char *argv[]) {
   //  processed in argv.  The system initializes this value to 1.  The
   //  caller can reset it to 1 to restart scanning of the same argv, or
   //  when scanning a new argument vector.
+  if (argv[optind] == NULL) {
+    // if no filepath given, list contents of current directory, just like in ls
+    return ls_files(".");
+  } else {
   return ls_files(argv[optind]);
+  }
 }
