@@ -7,6 +7,7 @@
 
 // Global Default Variables for `ls` flags
 bool exclude_hidden = true;
+bool recursive_ls = false;
 
 int is_directory(const char *path) {
   struct stat stat_buffer;
@@ -57,7 +58,7 @@ int ls_files(const char *path) {
       printf("%s\n", filepath);
     }
 
-    if (is_directory(filepath) && strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
+    if (recursive_ls == true && is_directory(filepath) && strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
       printf("\n%s%s:\n%s", TERMINAL_MAGENTA, filepath, TERMINAL_RESET);
       ls_files(filepath);
     }
@@ -75,11 +76,15 @@ void set_ls_flags(int argc, char *argv[]) {
   int option;
 
   // getopt returns -1 when there are no more options to process
-  while((option = getopt(argc, argv, "a")) != -1) {
+  while((option = getopt(argc, argv, "aR")) != -1) {
     switch(option) {
       case 'a':
         printf("Flag `-%c` passed. Will list hidden files.\n", option);
         exclude_hidden = false;
+        break;
+      case 'R':
+        printf("Given option %c. Will ls recursively.\n", option);
+        recursive_ls = true;
         break;
       case '?': // getopt returns '?' when there is an option without a case
         // By default, getopt() prints an error message on standard
