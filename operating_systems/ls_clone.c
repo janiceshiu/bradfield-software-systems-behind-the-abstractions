@@ -3,8 +3,9 @@
 #include <stdbool.h> // contains the definition for booleans
 #include <stdio.h>
 #include <unistd.h> // contains the `optind` variable
+#include <string.h> // for `strlen` and `strcmp`
 
-// Global Variables for `ls` flags
+// Global Default Variables for `ls` flags
 bool exclude_hidden = true;
 
 int is_directory(const char *path) {
@@ -42,13 +43,23 @@ int ls_files(const char *path) {
       continue;
     }
 
+    int buffer_size = strlen(path) + strlen(entry->d_name) + 2;
+    char filepath[buffer_size];
+    snprintf(filepath, buffer_size, "%s/%s", path, entry->d_name);
+
     #define TERMINAL_CYAN  "\x1B[36m"
+    #define TERMINAL_MAGENTA "\x1B[35m"
     #define TERMINAL_RESET "\x1B[0m"
 
-    if (is_directory(entry->d_name)) {
-      printf("%s%s\n%s", TERMINAL_CYAN, entry->d_name, TERMINAL_RESET);
+    if (is_directory(filepath)) {
+      printf("%s%s%s\n", TERMINAL_CYAN, filepath, TERMINAL_RESET);
     } else {
-      printf("%s\n", entry->d_name);
+      printf("%s\n", filepath);
+    }
+
+    if (is_directory(filepath) && strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
+      printf("\n%s%s:\n%s", TERMINAL_MAGENTA, filepath, TERMINAL_RESET);
+      ls_files(filepath);
     }
   }
 
